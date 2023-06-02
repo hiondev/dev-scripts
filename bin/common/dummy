@@ -1,0 +1,6 @@
+#!/bin/bash
+SQL_CONNECTION="dummy"
+SQL_NAME="dummy"
+SQL_USER="dummy"
+SQL_PASSWORD="dummy"
+SQL_PREFIX="dummy"
