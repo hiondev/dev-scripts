@@ -1,11 +1,20 @@
 {
   "name": "@hiondev/cli",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Hion GCP dev scripts package",
   "scripts": {
     "hiondev": "./bin/bootstrap-dev",
     "hionsetup": "./bin/bootstrap-setup"
   },
   "author": "Hion Digital",
-  "license": "ISC"
+  "license": "ISC",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hiondev/dev-scripts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hiondev/dev-scripts/issues"
+  },
+  "homepage": "https://github.com/hiondev/dev-scripts#readme"
 }
