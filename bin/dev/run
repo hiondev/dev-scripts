@@ -9,6 +9,13 @@ fi
 
 COMMAND_ARGS=${@:-/bin/sh}
 
+export PROJECT_ID
+export SQL_CONNECTION="dummy"
+export SQL_NAME="dummy"
+export SQL_USER="dummy"
+export SQL_PASSWORD="dummy"
+export SQL_PREFIX="dummy"
+
 docker compose --project-directory $ROOT_DIR  \
 -f $HIONDEV_DIR/docker-compose.yaml \
-run --rm app $COMMAND_ARGS
+--profile local-dev run --rm dev-local $COMMAND_ARGS
