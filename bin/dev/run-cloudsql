@@ -1,0 +1,32 @@
+#!/bin/bash
+export SCRIPT_PATH
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+DATABASE_NAME=$2
+
+if [[ -z $DATABASE_NAME ]]; then
+    echo "Usage: npm run hiondev run-clousql $ENVIRONMENT <database name> [command]"
+    echo
+    echo "Cloud SQL \`${SQL_INSTANCE}\` databases:"
+    # List all databases in the SQL instance, exclude system databases
+    gcloud --project=$PROJECT_ID sql databases list --instance=$SQL_INSTANCE | grep -v -e '^information_schema' -e '^performance_schema' -e '^mysql' -e '^sys' | sed -e 's/^/    /'
+    exit
+fi
+shift
+shift
+
+COMMAND_ARGS=${@:-/bin/sh}
+
+export PROJECT_ID
+export SQL_CONNECTION
+export SQL_NAME=$DATABASE_NAME
+export SQL_USER
+export SQL_PASSWORD
+export SQL_PREFIX
+
+docker compose --project-directory $ROOT_DIR \
+-f $HIONDEV_DIR/docker-compose.yaml \
+run --rm app-cloud-sql-proxy $COMMAND_ARGS

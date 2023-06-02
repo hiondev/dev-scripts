@@ -1,0 +1,45 @@
+#!/bin/bash
+export SCRIPT_PATH
+export PROJECT_ID
+
+if [ "$1" = "help" ]; then
+    echo "Upload a database dump to Cloud SQL"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+FILENAME=$2
+
+if [[ -z $FILENAME ]]; then
+    echo "Usage: npm run hiondev db-upload $ENVIRONMENT [filename]"
+    echo
+    echo "Cloud SQL \`${SQL_INSTANCE}\` databases:"
+    # List all databases in the SQL instance, exclude system databases and indent the output with 4 spaces
+    gcloud --project=$PROJECT_ID sql databases list --instance=$SQL_INSTANCE | grep -v -e '^information_schema' -e '^performance_schema' -e '^mysql' -e '^sys' | sed -e 's/^/    /'
+    exit
+fi
+
+temporary_bucket=${PROJECT_ID}-sql-transfer-temporary-${RANDOM}
+
+SA_NAME=$(gcloud sql instances describe $SQL_INSTANCE --project=$PROJECT_ID --format="value(serviceAccountEmailAddress)")
+gsutil mb -p $PROJECT_ID -c regional -l europe-north1 gs://$temporary_bucket
+gsutil iam ch serviceAccount:${SA_NAME}:objectAdmin gs://$temporary_bucket
+
+echo -n "Uploading $FILENAME to gs://$temporary_bucket..."
+if file "$FILENAME" | grep -q "gzip compressed data"; then
+    gsutil -q cp $FILENAME gs://$temporary_bucket/dump.sql.gz
+else
+    gzip -c $FILENAME | gsutil -q cp - gs://$temporary_bucket/dump.sql.gz
+fi
+echo "Uploaded."
+gsutil ls -lh gs://$temporary_bucket/dump.sql.gz
+
+gcloud --project=$PROJECT_ID sql backups create --instance=$SQL_INSTANCE --description=dev/db-upload
+gcloud --project=$PROJECT_ID sql import sql $SQL_INSTANCE gs://$temporary_bucket/dump.sql.gz --database=$SQL_NAME
+
+echo -n "Removing gs://$temporary_bucket..."
+gsutil -q rm -r gs://$temporary_bucket
+echo "Removed."

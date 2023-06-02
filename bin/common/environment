@@ -1,0 +1,26 @@
+#!/bin/bash
+
+ENVIRONMENT=$1
+
+# If common environment file exists, source it
+if [[ -f $CONFIG_DIR/common ]]
+then
+    source $CONFIG_DIR/common
+else
+    echo "The common environment file is missing."
+    exit
+fi
+
+# If the environment is not specified, print the help
+if [[ -z "$ENVIRONMENT" ]]
+then
+    echo "The command is missing the environment argument."
+    echo
+    echo "Available environments:"
+    # List all files under the config directory and echo the filename without extension, ignore common
+    ls -1 $CONFIG_DIR | sed -e 's/\..*$//' | grep -v common | sed -e 's/^/    /'
+    echo ""
+    read -p "Choose the environment: " ENVIRONMENT
+fi
+
+source $CONFIG_DIR/$ENVIRONMENT || exit

@@ -1,0 +1,51 @@
+#!/bin/bash
+export SCRIPT_PATH
+export PROJECT_ID
+
+if [ "$1" = "help" ]; then
+    echo "Download a database dump from Cloud SQL to a file"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+DATABASE_NAME=$2
+FILENAME=$3
+
+if [ -z $DATABASE_NAME ]; then
+    echo "Usage: npm run hiondev db-download $ENVIRONMENT [filename]"
+    echo "If you omit the filename, the dump will be saved to $ENVIRONMENT-$(date +%F).sql.gz"
+    echo
+    echo "Cloud SQL \`${SQL_INSTANCE}\` databases:"
+    # List all databases in the SQL instance, exclude system databases
+    gcloud --project=$PROJECT_ID sql databases list --instance=$SQL_INSTANCE | grep -v -e '^information_schema' -e '^performance_schema' -e '^mysql' -e '^sys' | sed -e 's/^/    /'
+    exit
+fi
+
+temporary_bucket=${PROJECT_ID}-sql-transfer-temporary-${RANDOM}
+
+SA_NAME=$(gcloud sql instances describe $SQL_INSTANCE --project=$PROJECT_ID --format="value(serviceAccountEmailAddress)")
+gsutil mb -p $PROJECT_ID -c regional -l europe-north1 gs://$temporary_bucket
+gsutil iam ch serviceAccount:${SA_NAME}:objectAdmin gs://$temporary_bucket
+sleep 2
+
+gcloud --project=$PROJECT_ID sql export sql $SQL_INSTANCE gs://$temporary_bucket/dump.sql.gz --database=$DATABASE_NAME
+gsutil ls -lh gs://$temporary_bucket/dump.sql.gz
+
+echo -n "Downloading gs://$temporary_bucket/dump.sql.gz to $FILENAME..."
+if [ -z $FILENAME ]; then
+    gsutil cp gs://$temporary_bucket/dump.sql.gz $ENVIRONMENT-$(date +%F).sql.gz
+else
+    if [[ "${FILENAME##*.}" = "gz" ]]; then
+        gsutil cp gs://$temporary_bucket/dump.sql.gz $FILENAME
+    else
+        gsutil cat gs://$temporary_bucket/dump.sql.gz | zcat > $FILENAME
+    fi
+fi
+echo "Downloaded."
+
+echo -n "Removing gs://$temporary_bucket..."
+gsutil -q rm -r gs://$temporary_bucket
+echo "Removed."

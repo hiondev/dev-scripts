@@ -1,0 +1,10 @@
+#!/bin/bash
+export PROJECT_ID
+export ROOT_DIR
+export HIONDEV_DIR
+
+COMMAND_ARGS=${@:-app /bin/sh}
+
+docker compose --project-directory $ROOT_DIR \
+-f $HIONDEV_DIR/docker-compose.run.yaml \
+exec $COMMAND_ARGS

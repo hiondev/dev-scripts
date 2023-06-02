@@ -1,0 +1,11 @@
+{
+  "name": "@hiondev/cli",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "hiondev": "./bin/bootstrap-dev",
+    "hionsetup": "./bin/bootstrap-setup"
+  },
+  "author": "Hion Digital",
+  "license": "ISC"
+}

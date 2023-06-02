@@ -1,0 +1,11 @@
+#!/bin/bash
+export PROJECT_ID
+
+if [ "$1" = "help" ]; then
+    echo "Stop the local containers"
+    exit
+fi
+
+docker compose --project-directory $ROOT_DIR \
+-f $HIONDEV_DIR/docker-compose.yaml \
+down --remove-orphans $@

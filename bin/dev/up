@@ -1,0 +1,12 @@
+#!/bin/bash
+export PROJECT_ID
+
+# If first parameter is help, show help and exit
+if [ "$1" = "help" ]; then
+    echo "Create and start local containers for the project"
+    exit
+fi
+
+docker compose --project-directory $ROOT_DIR  \
+-f $HIONDEV_DIR/docker-compose.yaml \
+up --build -d --remove-orphans $@

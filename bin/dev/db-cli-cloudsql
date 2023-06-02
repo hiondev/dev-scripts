@@ -1,0 +1,17 @@
+#!/bin/bash
+export SCRIPT_PATH
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+export PROJECT_ID
+export SQL_CONNECTION
+export SQL_NAME
+export SQL_USER
+export SQL_PASSWORD
+export SQL_PREFIX
+
+docker compose --project-directory $ROOT_DIR \
+-f $HIONDEV_DIR/docker-compose.yaml \
+--profile cloud-sql-proxy run --rm app-cloud-sql-proxy mysql -S /cloudsql/$SQL_CONNECTION $SQL_NAME

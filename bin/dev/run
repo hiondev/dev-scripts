@@ -1,0 +1,14 @@
+#!/bin/bash
+export SCRIPT_PATH
+
+# If first parameter is help, show help and exit
+if [ "$1" = "help" ]; then
+    echo "Run a command inside the app container"
+    exit
+fi
+
+COMMAND_ARGS=${@:-/bin/sh}
+
+docker compose --project-directory $ROOT_DIR  \
+-f $HIONDEV_DIR/docker-compose.yaml \
+run --rm app $COMMAND_ARGS

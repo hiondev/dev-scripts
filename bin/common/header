@@ -1,0 +1,34 @@
+#!/bin/bash
+declare ROOT_DIR
+declare HIONDEV_DIR
+declare CONFIG_DIR
+
+# Create a scoped function to contain the variables
+# other than ROOT_DIR and CONFIG_DIR
+header() {
+    # Try to find the "hiondev" directory
+    dir=$(realpath .)
+
+    # Loop recursively until we find the "hiondev" directory
+    # or reach the root directory
+    while [[ "$dir" != "/" && ! -d "$dir/hiondev" ]]
+    do
+        dir=$(dirname "$dir")
+    done
+
+    if [[ "$dir" == "/" ]]
+    then
+        echo "Could not find the hiondev directory"
+        exit
+    else
+        ROOT_DIR=$dir
+        HIONDEV_DIR=$dir/hiondev
+        CONFIG_DIR=$dir/hiondev/.config
+    fi
+}
+
+# Call the function
+header
+
+# Remove the function
+unset -f header

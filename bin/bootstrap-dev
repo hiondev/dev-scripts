@@ -1,0 +1,23 @@
+#!/bin/bash
+SCRIPT_PATH=$(dirname "$(realpath "$0")")
+
+source $SCRIPT_PATH/common/header
+
+COMMAND=$1
+shift
+
+# If the command is not specified, print the help
+if [[ -z "$COMMAND" ]]
+then
+    echo "Usage: npm run hiondev <command>"
+    echo
+    echo "Available commands:"
+    # Loop through commands in the dev directory ignoring directories
+    for command in $(ls -1 $SCRIPT_PATH/dev | grep -v /)
+    do
+        help=$($SCRIPT_PATH/dev/run-command $command help)
+        printf "    \033[0;32m%-12s\033[0m %s \n" "$command" "$help"
+    done
+fi
+source $CONFIG_DIR/common
+source $SCRIPT_PATH/dev/run-command $COMMAND $@

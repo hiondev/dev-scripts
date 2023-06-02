@@ -1,0 +1,35 @@
+#!/bin/bash
+export SCRIPT_PATH
+
+if [ "$1" = "help" ]; then
+    echo "Export a database from the local container"
+    exit
+fi
+
+DATABASE_NAME=$1
+FILENAME=$2
+if [ -z $DATABASE_NAME ]; then
+    echo "Usage: npm run hiondev local-db-export <database name> [filename]"
+    echo "If you omit the filename, the dump will be saved to local-$(date +%F).sql.gz"
+    echo
+    echo "Container DB databases:"
+    $SCRIPT_PATH/dev/run-command exec --no-TTY db mysql --user=root --skip-column-names <<< "show databases;"
+    exit
+fi
+
+if [ -z $FILENAME ]; then
+    FILENAME=local-$(date +%F).sql.gz
+fi
+
+if [[ "${FILENAME##*.}" = "gz" ]]; then
+    $SCRIPT_PATH/dev/run-command exec --no-TTY db \
+        mysqldump --compress --user=root --hex-blob --no-autocommit \
+        --default-character-set=utf8mb4 --single-transaction \
+        $DATABASE_NAME > $FILENAME
+else
+    $SCRIPT_PATH/dev/run-command exec --no-TTY db \
+        mysqldump --user=root --hex-blob --no-autocommit \
+        --default-character-set=utf8mb4 --single-transaction \
+        $DATABASE_NAME > $FILENAME
+fi
+
