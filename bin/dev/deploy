@@ -1,6 +1,4 @@
 #!/bin/bash
-export SCRIPT_PATH
-
 if [ "$1" = "help" ]; then
     echo "Deploy a service to Cloud Run"
     exit

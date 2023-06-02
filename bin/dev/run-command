@@ -1,9 +1,4 @@
 #!/bin/bash
-export ROOT_DIR
-export HIONDEV_DIR
-export CONFIG_DIR
-export SCRIPT_PATH
-
 COMMAND=$1
 shift
 ARGS=$@

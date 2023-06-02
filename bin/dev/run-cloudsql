@@ -1,5 +1,10 @@
 #!/bin/bash
-export SCRIPT_PATH
+
+# If first parameter is help, show help and exit
+if [ "$1" = "help" ]; then
+    echo "Run a command inside the app container with Cloud SQL Proxy"
+    exit
+fi
 
 ENVIRONMENT=$1
 
@@ -20,12 +25,7 @@ shift
 
 COMMAND_ARGS=${@:-/bin/sh}
 
-export PROJECT_ID
-export SQL_CONNECTION
 export SQL_NAME=$DATABASE_NAME
-export SQL_USER
-export SQL_PASSWORD
-export SQL_PREFIX
 
 docker compose --project-directory $ROOT_DIR \
 -f $HIONDEV_DIR/docker-compose.yaml \

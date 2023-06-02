@@ -1,6 +1,4 @@
 #!/bin/bash
-export SCRIPT_PATH
-export PROJECT_ID
 
 if [ "$1" = "help" ]; then
     echo "Download a database dump from Cloud SQL to a file"

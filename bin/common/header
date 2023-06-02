@@ -21,9 +21,9 @@ header() {
         echo "Could not find the hiondev directory"
         exit
     else
-        ROOT_DIR=$dir
-        HIONDEV_DIR=$dir/hiondev
-        CONFIG_DIR=$dir/hiondev/.config
+        export ROOT_DIR=$dir
+        export HIONDEV_DIR=$dir/hiondev
+        export CONFIG_DIR=$dir/hiondev/.config
     fi
 }
 

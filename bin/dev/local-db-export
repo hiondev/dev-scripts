@@ -1,5 +1,4 @@
 #!/bin/bash
-export SCRIPT_PATH
 
 if [ "$1" = "help" ]; then
     echo "Export a database from the local container"

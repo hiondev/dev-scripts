@@ -1,5 +1,4 @@
 #!/bin/bash
-export SCRIPT_PATH
 
 # If first parameter is help, show help and exit
 if [ "$1" = "help" ]; then
@@ -9,12 +8,7 @@ fi
 
 COMMAND_ARGS=${@:-/bin/sh}
 
-export PROJECT_ID
-export SQL_CONNECTION="dummy"
-export SQL_NAME="dummy"
-export SQL_USER="dummy"
-export SQL_PASSWORD="dummy"
-export SQL_PREFIX="dummy"
+source $SCRIPT_PATH/common/dummy
 
 docker compose --project-directory $ROOT_DIR  \
 -f $HIONDEV_DIR/docker-compose.yaml \

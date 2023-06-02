@@ -5,7 +5,9 @@ ENVIRONMENT=$1
 # If common environment file exists, source it
 if [[ -f $CONFIG_DIR/common ]]
 then
+    set -a
     source $CONFIG_DIR/common
+    set +a
 else
     echo "The common environment file is missing."
     exit
@@ -23,4 +25,6 @@ then
     read -p "Choose the environment: " ENVIRONMENT
 fi
 
+set -a
 source $CONFIG_DIR/$ENVIRONMENT || exit
+set +a

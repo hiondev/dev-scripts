@@ -1,5 +1,9 @@
 #!/bin/bash
-export SCRIPT_PATH
+
+if [ "$1" = "help" ]; then
+    echo "Import a database to the local container"
+    exit
+fi
 
 DATABASE_NAME=$1
 FILENAME=$2

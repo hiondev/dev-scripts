@@ -1,5 +1,10 @@
 #!/bin/bash
-export SCRIPT_PATH
+
+# If first parameter is help, show help and exit
+if [ "$1" = "help" ]; then
+    echo "Create and start containers for the project using the Cloud SQL proxy"
+    exit
+fi
 
 ENVIRONMENT=$1
 
@@ -17,12 +22,7 @@ if [[ -z $DATABASE_NAME ]]; then
 fi
 shift
 
-export PROJECT_ID
-export SQL_CONNECTION
 export SQL_NAME=${DATABASE_NAME:-$SQL_NAME}
-export SQL_USER
-export SQL_PASSWORD
-export SQL_PREFIX
 
 docker compose --project-directory $ROOT_DIR \
 -f $HIONDEV_DIR/docker-compose.yaml \

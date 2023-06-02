@@ -1,6 +1,6 @@
 #!/bin/bash
-SQL_CONNECTION="dummy"
-SQL_NAME="dummy"
-SQL_USER="dummy"
-SQL_PASSWORD="dummy"
-SQL_PREFIX="dummy"
+export SQL_CONNECTION="dummy"
+export SQL_NAME="dummy"
+export SQL_USER="dummy"
+export SQL_PASSWORD="dummy"
+export SQL_PREFIX="dummy"

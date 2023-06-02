@@ -1,6 +1,4 @@
 #!/bin/bash
-export SCRIPT_PATH
-export PROJECT_ID
 
 if [ "$1" = "help" ]; then
     echo "Upload a database dump to Cloud SQL"
