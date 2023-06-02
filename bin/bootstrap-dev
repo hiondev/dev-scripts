@@ -9,7 +9,7 @@ shift
 # If the command is not specified, print the help
 if [[ -z "$COMMAND" ]]
 then
-    echo "Usage: npm run hiondev <command>"
+    echo "Usage: npx hiondev <command>"
     echo
     echo "Available commands:"
     # Loop through commands in the dev directory ignoring directories
