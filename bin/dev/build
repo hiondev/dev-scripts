@@ -7,6 +7,5 @@ fi
 source $SCRIPT_PATH/common/dummy
 
 docker compose --project-directory $ROOT_DIR \
--f $HIONDEV_DIR/docker-compose.yaml \
---profile local-dev build app-local \
+-f $HIONDEV_DIR/docker-compose.yaml build app-build \
 --build-arg=GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
