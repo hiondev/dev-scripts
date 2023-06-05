@@ -1,0 +1,35 @@
+#!/bin/bash
+# If first parameter is help, show help and exit
+if [ "$1" = "help" ]; then
+    echo "Deploy the environment variables to Cloud Run"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+SERVICE_NAME=$RUN_SERVICE_NAME
+# Set generic config and all `.env` variables.
+gcloud beta --project=$PROJECT_ID \
+run services update $SERVICE_NAME \
+--region=$RUN_REGION \
+--execution-environment=gen2 \
+--service-account=$RUN_SERVICE_ACCOUNT \
+$(cat .env | sed -e '/^#/d;/^\s*$/d;s/^\([^=]*\)=\(.*\)/--update-env-vars=\1=\2/g')
+# Set database connection and related envs.
+# These override the DB_* envs from above.
+gcloud beta --project=$PROJECT_ID \
+run services update $SERVICE_NAME \
+--region=$RUN_REGION \
+--add-cloudsql-instances=$SQL_CONNECTION \
+--update-env-vars=DB_HOST=$SQL_HOST \
+--update-env-vars=DB_NAME=$SQL_NAME \
+--update-env-vars=DB_USER=$SQL_USER \
+--update-env-vars=DB_PASSWORD=$SQL_PASSWORD \
+--update-env-vars=DB_PREFIX=$SQL_PREFIX
+# Allow unauthenticated invocations.
+gcloud --project=$PROJECT_ID \
+run services add-iam-policy-binding $SERVICE_NAME \
+--region=$RUN_REGION \
+--member=allUsers --role=roles/run.invoker
