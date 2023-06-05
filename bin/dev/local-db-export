@@ -12,7 +12,9 @@ if [ -z $DATABASE_NAME ]; then
     echo "If you omit the filename, the dump will be saved to local-$(date +%F).sql.gz"
     echo
     echo "Container DB databases:"
-    $SCRIPT_PATH/dev/run-command exec --no-TTY db mysql --user=root --skip-column-names <<< "show databases;"
+    docker compose --project-directory $ROOT_DIR \
+    -f $HIONDEV_DIR/docker-compose.yaml exec --no-TTY \
+    local-db mysql --user=root --skip-column-names <<< "show databases;"
     exit
 fi
 
@@ -21,14 +23,16 @@ if [ -z $FILENAME ]; then
 fi
 
 if [[ "${FILENAME##*.}" = "gz" ]]; then
-    $SCRIPT_PATH/dev/run-command exec --no-TTY db \
-        mysqldump --compress --user=root --hex-blob --no-autocommit \
-        --default-character-set=utf8mb4 --single-transaction \
-        $DATABASE_NAME > $FILENAME
+    docker compose --project-directory $ROOT_DIR \
+    -f $HIONDEV_DIR/docker-compose.yaml exec --no-TTY local-db \
+    mysqldump --user=root --hex-blob --no-autocommit \
+    --default-character-set=utf8mb4 --single-transaction \
+    $DATABASE_NAME | gzip > $FILENAME
 else
-    $SCRIPT_PATH/dev/run-command exec --no-TTY db \
-        mysqldump --user=root --hex-blob --no-autocommit \
-        --default-character-set=utf8mb4 --single-transaction \
-        $DATABASE_NAME > $FILENAME
+    docker compose --project-directory $ROOT_DIR \
+    -f $HIONDEV_DIR/docker-compose.yaml exec --no-TTY local-db \
+    mysqldump --user=root --hex-blob --no-autocommit \
+    --default-character-set=utf8mb4 --single-transaction \
+    $DATABASE_NAME > $FILENAME
 fi
 

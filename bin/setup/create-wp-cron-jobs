@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ "$1" = "help" ]; then
+    echo "Create cron jobs for the app"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+SERVICE_NAME=$2
+TAG_NAME=${3:-latest}
+
+IMAGE_NAME=${ARTIFACT_REGISTRY}/${SERVICE_NAME}:${TAG_NAME}
+SERVICE_NAME=${SERVICE_NAME}-wp-cron
+JOB_INVOKE_URL=https://${RUN_REGION}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${PROJECT_ID}/jobs/${SERVICE_NAME}:run
+set -e
+
+gcloud alpha --project=$PROJECT_ID \
+run jobs create $SERVICE_NAME \
+--image=$IMAGE_NAME --region=$RUN_REGION \
+--args=wp,cron,event,run,--due-now \
+--service-account=$RUN_SERVICE_ACCOUNT \
+$(cat .env | sed -e '/^#/d;/^\s*$/d;s/^\([^=]*\)=\(.*\)/--set-env-vars=\1=\2/g')
+
+gcloud alpha --project=$PROJECT_ID \
+run jobs update $SERVICE_NAME \
+--region=$RUN_REGION \
+--add-cloudsql-instances=$SQL_CONNECTION \
+--update-env-vars=WP_REDIS_DISABLED=true \
+--update-env-vars=DB_HOST=$SQL_HOST \
+--update-env-vars=DB_NAME=$SQL_NAME \
+--update-env-vars=DB_USER=$SQL_USER \
+--update-env-vars=DB_PASSWORD=$SQL_PASSWORD \
+--update-env-vars=DB_PREFIX=$SQL_PREFIX
+
+gcloud --project=$PROJECT_ID \
+scheduler jobs create http ${SERVICE_NAME} \
+--location=europe-west3 \
+--schedule="*/10 * * * *" \
+--uri=$JOB_INVOKE_URL --http-method POST \
+--oauth-service-account-email=$RUN_SERVICE_ACCOUNT

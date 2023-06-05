@@ -1,20 +1,24 @@
 #!/bin/bash
-SCRIPT_PATH=$(dirname "$0")
-ENVIRONMENT=$1
-COMMAND=$2
-
-# If the command is not specified, print the help
-if [[ -z "$ENVIRONMENT" || -z "$COMMAND" ]]
-then
-    echo "Usage: $0 <environment> <command>"
-    echo
-    echo "Commands:"
-    echo "  up"
-    echo "  down"
-    echo "  exec"
-    echo "  local-db-export"
-    echo "  local-db-import"
-fi
+export SCRIPT_PATH=$(dirname "$(realpath "$0")")
 
 source $SCRIPT_PATH/common/header
-source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+COMMAND=$1
+shift
+
+# If the command is not specified, print the help
+if [[ -z "$COMMAND" ]]
+then
+    echo "Usage: npx hionsetup <command>"
+    echo
+    echo "Available commands:"
+    # Loop through commands in the dev directory ignoring directories
+    for command in $(ls -1 $SCRIPT_PATH/setup | grep -v run-command)
+    do
+        help=$(SCRIPT_PATH=$SCRIPT_PATH; $SCRIPT_PATH/dev/run-command $command help)
+        printf "    \033[0;32m%-20s\033[0m %s \n" "$command" "$help"
+    done
+    exit
+fi
+source $CONFIG_DIR/common
+source $SCRIPT_PATH/setup/run-command $COMMAND $@

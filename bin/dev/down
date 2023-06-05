@@ -4,8 +4,6 @@ if [ "$1" = "help" ]; then
     exit
 fi
 
-source $SCRIPT_PATH/common/dummy
-
 docker compose --project-directory $ROOT_DIR \
 -f $HIONDEV_DIR/docker-compose.yaml \
 down --remove-orphans $@

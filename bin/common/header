@@ -30,5 +30,8 @@ header() {
 # Call the function
 header
 
+# Load dummy variables to use as defaults
+source $SCRIPT_PATH/common/dummy
+
 # Remove the function
 unset -f header

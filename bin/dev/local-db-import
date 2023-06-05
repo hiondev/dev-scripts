@@ -11,10 +11,21 @@ if [ -z $DATABASE_NAME ] || [ -z $FILENAME ]; then
     echo "Usage: $0 <database name> <filename>"
     echo
     echo "Container DB databases:"
-    $SCRIPT_PATH/dev/run-command exec --no-TTY db mysql --user=root --skip-column-names <<< "show databases;"
+    docker compose --project-directory $ROOT_DIR \
+    -f $HIONDEV_DIR/docker-compose.yaml exec --no-TTY \
+    local-db mysql --user=root --skip-column-names <<< "show databases;"
     exit
 fi
 
-$SCRIPT_PATH/exec --no-TTY db \
-    mysql --user=root --one-database \
-    $DATABASE_NAME < $FILENAME
+
+if [[ "${FILENAME##*.}" = "gz" ]]; then
+    gunzip -c $FILENAME | docker compose --project-directory $ROOT_DIR \
+        -f $HIONDEV_DIR/docker-compose.yaml exec --no-TTY \
+        local-db mysql --user=root --one-database \
+        $DATABASE_NAME
+else
+    docker compose --project-directory $ROOT_DIR \
+        -f $HIONDEV_DIR/docker-compose.yaml exec --no-TTY \
+        local-db mysql --user=root --one-database \
+        $DATABASE_NAME < $FILENAME
+fi

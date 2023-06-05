@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$1" = "help" ]; then
+    echo "Create a bucket for uploads"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+GCS_UPLOADS_BUCKET=$PROJECT_ID-$ENVIRONMENT-app-uploads
+
+gsutil mb -l europe-north1 gs://$GCS_UPLOADS_BUCKET
+gsutil iam ch allUsers:objectViewer gs://$GCS_UPLOADS_BUCKET
+
+gcloud run services update $RUN_SERVICE_NAME \
+--region=europe-north1 \
+--update-env-vars=GCS_UPLOADS_BUCKET=$GCS_UPLOADS_BUCKET

@@ -8,8 +8,6 @@ fi
 
 COMMAND_ARGS=${@:-/bin/sh}
 
-source $SCRIPT_PATH/common/dummy
-
 docker compose --project-directory $ROOT_DIR  \
 -f $HIONDEV_DIR/docker-compose.yaml \
 --profile local-dev run --rm dev-local $COMMAND_ARGS

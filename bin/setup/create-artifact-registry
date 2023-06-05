@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$1" = "help" ]; then
+    echo "Create an Artifact Registry"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+source $SCRIPT_PATH/common/environment $ENVIRONMENT
+
+gcloud --project=$PROJECT_ID \
+artifacts repositories create $ARTIFACT_REGISTRY_NAME \
+--location=$ARTIFACT_REGISTRY_LOCATION \
+--repository-format=docker
