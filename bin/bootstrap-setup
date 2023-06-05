@@ -1,24 +1,4 @@
 #!/bin/bash
 export SCRIPT_PATH=$(dirname "$(realpath "$0")")
 
-source $SCRIPT_PATH/common/header
-
-COMMAND=$1
-shift
-
-# If the command is not specified, print the help
-if [[ -z "$COMMAND" ]]
-then
-    echo "Usage: npx hionsetup <command>"
-    echo
-    echo "Available commands:"
-    # Loop through commands in the dev directory ignoring directories
-    for command in $(ls -1 $SCRIPT_PATH/setup | grep -v run-command)
-    do
-        help=$(SCRIPT_PATH=$SCRIPT_PATH; $SCRIPT_PATH/dev/run-command $command help)
-        printf "    \033[0;32m%-20s\033[0m %s \n" "$command" "$help"
-    done
-    exit
-fi
-source $CONFIG_DIR/common
-source $SCRIPT_PATH/setup/run-command $COMMAND $@
+source $SCRIPT_PATH/bootstrap setup $@

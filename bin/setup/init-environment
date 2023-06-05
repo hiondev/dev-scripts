@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ "$1" = "help" ]; then
+    echo "Initialize a new environment file"
+    exit
+fi
+
+ENVIRONMENT=$1
+
+# Create the environment file in the $CONFIG_DIR directory
+ENVIRONMENT_FILE=$CONFIG_DIR/$ENVIRONMENT
+
+if [ -f $ENVIRONMENT_FILE ]; then
+    echo "Environment file $ENVIRONMENT_FILE already exists"
+    exit
+fi
+
+# Copy the template file to the environment file appending = to all variables
+cat $ENV_TEMPLATES_PATH/environment | sed 's/$/=/g' > $ENVIRONMENT_FILE
+
+echo "Created environment file $ENVIRONMENT_FILE, please fill in the missing variables"

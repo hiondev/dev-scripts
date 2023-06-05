@@ -6,11 +6,23 @@ ARGS=$@
 # If the command can be found inside $HIONDEV_DIR, run it from there
 if [[ -f $HIONDEV_DIR/$COMMAND ]]
 then
+    # If verbose, set -x
+    if [[ "$VERBOSE" == "true" ]]
+    then
+        set -x
+    fi
+
     source $HIONDEV_DIR/$COMMAND $ARGS
 else
     # If the command can be found inside $SCRIPT_PATH/dev, run it from there
     if [[ -f $SCRIPT_PATH/dev/$COMMAND ]]
     then
+        # If verbose, set -x
+        if [[ "$VERBOSE" == "true" ]]
+        then
+            set -x
+        fi
+
         source $SCRIPT_PATH/dev/$COMMAND $ARGS
     else
         echo "The command $SCRIPT_PATH/dev/$COMMAND is not available."

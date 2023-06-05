@@ -1,0 +1,38 @@
+#!/bin/bash
+export ENV_TEMPLATES_PATH=$SCRIPT_PATH/../env-templates
+
+# Read the dev or setup directory from the first parameter
+collection=$1
+shift
+
+source $SCRIPT_PATH/common/header
+
+# If any of the parameters is "--verbose", set the bash to verbose mode
+if [[ "$@" =~ "--verbose" ]]
+then
+    export VERBOSE=true
+
+    # Remove the "--verbose" parameter from the list of parameters
+    set -- "${@/--verbose/}"
+fi
+
+COMMAND=$1
+shift
+
+# If the command is not specified or is "help", print the help
+if [[ -z "$COMMAND" || "$COMMAND" == "help" ]]
+then
+    echo "Usage: npx hion${collection} <command>"
+    echo
+    echo "Available commands:"
+    # Loop through commands in the dev directory
+    for command in $(ls -1 $SCRIPT_PATH/$collection | grep -v run-command)
+    do
+        help=$(SCRIPT_PATH=$SCRIPT_PATH; $SCRIPT_PATH/$collection/run-command $command help | head -n 1)
+        printf "    \033[0;32m%-20s\033[0m %s \n" "$command" "$help"
+    done
+    exit
+fi
+source $CONFIG_DIR/common
+
+source $SCRIPT_PATH/$collection/run-command $COMMAND $@

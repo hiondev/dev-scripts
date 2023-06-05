@@ -19,16 +19,31 @@ header() {
     if [[ "$dir" == "/" ]]
     then
         echo "Could not find the hiondev directory"
-        exit
+        exit 1
     else
         export ROOT_DIR=$dir
         export HIONDEV_DIR=$dir/hiondev
         export CONFIG_DIR=$dir/hiondev/.config
     fi
+
+    # Validate the config directory
+    if [[ ! -d "$CONFIG_DIR" ]]
+    then
+        echo "Could not find the .config directory"
+        exit 1
+    fi
+
+    source $SCRIPT_PATH/common/validate-config
+
+    # If validate-config returned an error, exit 1
+    if [[ $? -ne 0 ]]
+    then
+        exit 1
+    fi
 }
 
-# Call the function
-header
+# Call the header function or exit on error
+header || exit 1
 
 # Load dummy variables to use as defaults
 source $SCRIPT_PATH/common/dummy

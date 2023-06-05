@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Check the common file
+if [[ ! -f $CONFIG_DIR/common ]]
+then
+    echo "The common environment file is missing."
+    exit
+fi
+
+function validate() {
+    # Read the filename from the first argument
+    filename=$1
+
+    # Parse the filename to get the environment name
+    environment=$(basename $filename)
+
+    # Read the wanted variables from the remaining arguments
+    wanted_variables=("${@:2}")
+
+    # Initialize an array to store missing variables
+    missing_variables=()
+
+    # Loop the wanted variables
+    for var in "${wanted_variables[@]}"; do
+        # Check if the variable is missing in the file
+        if ! grep -q "^$var=" $filename; then
+            missing_variables+=("$var")
+        fi
+    done
+
+    # Check if any wanted variables are missing
+    if [ ${#missing_variables[@]} -ne 0 ]; then
+        echo "The following variables are missing in the $environment file:"
+        for var in "${missing_variables[@]}"; do
+            echo "- $var"
+        done
+        return 1
+    else
+        return 0
+    fi
+}
+
+# Validate the common file
+validate $CONFIG_DIR/common PROJECT_ID
+
+# Loop through all the configs in .config and validate them
+for file in $CONFIG_DIR/*; do
+    if [[ "$file" == "$CONFIG_DIR/common" ]]; then
+        validate $file $(cat $ENV_TEMPLATES_PATH/common)
+    else
+        validate $file $(cat $ENV_TEMPLATES_PATH/environment)
+    fi
+done

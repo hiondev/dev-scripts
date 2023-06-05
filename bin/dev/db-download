@@ -1,7 +1,18 @@
 #!/bin/bash
 
-if [ "$1" = "help" ]; then
+help() {
     echo "Download a database dump from Cloud SQL to a file"
+    echo
+    echo "Usage: npm run hiondev db-download $ENVIRONMENT [filename]"
+    echo "If you omit the filename, the dump will be saved to $ENVIRONMENT-$(date +%F).sql.gz"
+    echo
+    echo "Cloud SQL \`${SQL_INSTANCE}\` databases:"
+    # List all databases in the SQL instance, exclude system databases
+    gcloud --project=$PROJECT_ID sql databases list --instance=$SQL_INSTANCE | grep -v -e '^information_schema' -e '^performance_schema' -e '^mysql' -e '^sys' | sed -e 's/^/    /'
+}
+
+if [ "$1" = "help" ]; then
+    help
     exit
 fi
 
@@ -13,12 +24,7 @@ DATABASE_NAME=$2
 FILENAME=$3
 
 if [ -z $DATABASE_NAME ]; then
-    echo "Usage: npm run hiondev db-download $ENVIRONMENT [filename]"
-    echo "If you omit the filename, the dump will be saved to $ENVIRONMENT-$(date +%F).sql.gz"
-    echo
-    echo "Cloud SQL \`${SQL_INSTANCE}\` databases:"
-    # List all databases in the SQL instance, exclude system databases
-    gcloud --project=$PROJECT_ID sql databases list --instance=$SQL_INSTANCE | grep -v -e '^information_schema' -e '^performance_schema' -e '^mysql' -e '^sys' | sed -e 's/^/    /'
+    help
     exit
 fi
 
