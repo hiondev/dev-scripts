@@ -9,12 +9,13 @@ ENVIRONMENT=$1
 source $SCRIPT_PATH/common/environment $ENVIRONMENT
 
 IMAGE_TAG=${2:-latest}
+BUILD_TARGET=${3:-runtime}
 
 IMAGE_NAME=${ARTIFACT_REGISTRY}/${SERVICE_NAME}${BUILD_TARGET:+-${BUILD_TARGET}}:${IMAGE_TAG}
 set -e
 
 gcloud --project=$PROJECT_ID builds submit . \
-    --config=${SCRIPT_PATH}/cloudbuild.yaml \
+    --config=${HIONDEV_DIR}/cloudbuild.yaml \
     --substitutions=_IMAGE_NAME=${IMAGE_NAME},\
     _BUILD_TARGET=${BUILD_TARGET}
 
