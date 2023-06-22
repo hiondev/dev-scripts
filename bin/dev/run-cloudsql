@@ -29,4 +29,4 @@ export SQL_NAME=$DATABASE_NAME
 
 docker compose --project-directory $ROOT_DIR \
 -f $HIONDEV_DIR/docker-compose.yaml \
-run --rm app-cloud-sql-proxy $COMMAND_ARGS
+--profile cloud-sql-proxy run --rm dev-cloud-sql-proxy $COMMAND_ARGS
