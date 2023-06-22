@@ -1,6 +1,6 @@
 {
   "name": "@hiondev/cli",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Hion GCP dev scripts package",
   "bin": {
     "hiondev": "./bin/bootstrap-dev",
