@@ -3,7 +3,7 @@
 help() {
     echo "Download a database dump from Cloud SQL to a file"
     echo
-    echo "Usage: npm run hiondev db-download $ENVIRONMENT [filename]"
+    echo "Usage: npm run hiondev db-download $ENVIRONMENT <database> [filename]"
     echo "If you omit the filename, the dump will be saved to $ENVIRONMENT-$(date +%F).sql.gz"
     echo
     echo "Cloud SQL \`${SQL_INSTANCE}\` databases:"
@@ -38,18 +38,29 @@ sleep 2
 gcloud --project=$PROJECT_ID sql export sql $SQL_INSTANCE gs://$temporary_bucket/dump.sql.gz --database=$DATABASE_NAME
 gsutil ls -lh gs://$temporary_bucket/dump.sql.gz
 
-echo -n "Downloading gs://$temporary_bucket/dump.sql.gz to $FILENAME..."
+echo "Downloading gs://$temporary_bucket/dump.sql.gz to $FILENAME..."
+
+gsutil cp gs://$temporary_bucket/dump.sql.gz dump-temp.sql.gz
+
+echo "Removing the database creation and usage clauses..."
+
+gunzip dump-temp.sql.gz
+sed -i '' "/^CREATE DATABASE/d" "dump-temp.sql"
+sed -i '' "/^USE/d" "dump-temp.sql"
+
 if [ -z $FILENAME ]; then
-    gsutil cp gs://$temporary_bucket/dump.sql.gz $ENVIRONMENT-$(date +%F).sql.gz
+    gzip dump-temp.sql
+    mv dump-temp.sql.gz $ENVIRONMENT-$(date +%F).sql.gz
 else
     if [[ "${FILENAME##*.}" = "gz" ]]; then
-        gsutil cp gs://$temporary_bucket/dump.sql.gz $FILENAME
+        gzip dump-temp.sql
+        mv dump-temp.sql.gz $FILENAME
     else
-        gsutil cat gs://$temporary_bucket/dump.sql.gz | zcat > $FILENAME
+        mv dump-temp.sql $FILENAME
     fi
 fi
-echo "Downloaded."
+echo "Download complete."
 
-echo -n "Removing gs://$temporary_bucket..."
+echo "Removing gs://$temporary_bucket..."
 gsutil -q rm -r gs://$temporary_bucket
 echo "Removed."
