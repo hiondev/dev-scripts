@@ -21,8 +21,9 @@ if [[ -z $DATABASE_NAME ]]; then
     exit
 fi
 shift
+shift
 
-export SQL_NAME=${DATABASE_NAME:-$SQL_NAME}
+export SQL_NAME=$DATABASE_NAME
 
 docker compose --project-directory $ROOT_DIR \
 -f $HIONDEV_DIR/docker-compose.yaml \
